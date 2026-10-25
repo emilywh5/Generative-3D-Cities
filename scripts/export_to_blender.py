@@ -108,7 +108,8 @@ def build_terrain(city: CityGrid):
             # face -- going around the loop, not diagonally across it:
             #   (y, x) -> (y, x+1) -> (y+1, x+1) -> (y+1, x)
             # Listing them in the wrong order gives you a bow-tie face.
-            face = (verts[y, x], verts[y, x + 1], verts[y + 1, x + 1], verts[y + 1, x])  
+            face = bm.faces.new((verts[y, x], verts[y, x + 1],
+                                 verts[y + 1, x + 1], verts[y + 1, x]))
 
             # TODO 3: colour the face by what's on that cell.
             # Set face.material_index to the position of the right name in
