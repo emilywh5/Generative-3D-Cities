@@ -123,6 +123,10 @@ def default_vector() -> dict:
     return {p.name: p.default for p in PARAM_SCHEMA}
 
 
+# cluster count used when the text says polycentric but gives no number
+POLYCENTRIC_DEFAULT_CLUSTERS = 3
+
+
 def to_generator_kwargs(params: dict) -> dict:
     """
     Map this schema's parameter names onto generate_city.py's build_city()
@@ -140,10 +144,18 @@ def to_generator_kwargs(params: dict) -> dict:
     water_spec = PARAM_BY_NAME["water_level"]
     water_level_kwarg = None if abs(water_level - water_spec.default) < 0.03 else water_level
 
+    # A polycentric city needs at least two centers, but "a city with several
+    # business districts" gives no number, so num_clusters keeps its default
+    # of 1 -- and the generator would build ONE randomly placed hub. When the
+    # text didn't say how many, use a sensible polycentric count instead.
+    clusters = int(round(params["num_clusters"]))
+    if params["city_archetype"] == "polycentric" and clusters < 2:
+        clusters = POLYCENTRIC_DEFAULT_CLUSTERS
+
     return {
         "terrain_archetype": params["terrain"],
         "city_archetype": params["city_archetype"],
-        "clusters": int(round(params["num_clusters"])),
+        "clusters": clusters,
         "density": params["density"],
         "cluster_tightness": params["cluster_tightness"],
         "relief": params["relief"],
